@@ -3,6 +3,16 @@ entries:
   kubernetes-pfsense-controller:
   - apiVersion: v2
     appVersion: 0.0.1
+    created: "2020-12-20T07:39:13.255156991Z"
+    description: A Helm chart for Kubernetes
+    digest: 9b5319b82dea099a9723ef215633f82e7a342ce0e9fb117ea8cdb84c9058e217
+    name: kubernetes-pfsense-controller
+    type: application
+    urls:
+    - https://github.com/travisghansen/kubernetes-pfsense-controller-chart/releases/download/kubernetes-pfsense-controller-0.1.2/kubernetes-pfsense-controller-0.1.2.tgz
+    version: 0.1.2
+  - apiVersion: v2
+    appVersion: 0.0.1
     created: "2020-12-20T07:35:43.036286089Z"
     description: A Helm chart for Kubernetes
     digest: aa281e5e21bbe69aa2130090744ed474a9092ff983b27db56d7a1904019d63f4
