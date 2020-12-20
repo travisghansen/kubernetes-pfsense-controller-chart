@@ -1,0 +1,53 @@
+{{- if .Values.rbac.enabled -}}
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: {{ include "kubernetes-pfsense-controller.fullname" . }}-{{ .Release.Namespace }}
+  labels:
+    {{- include "kubernetes-pfsense-controller.labels" . | nindent 4 }}
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - nodes
+  - services
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - patch
+- apiGroups:
+  - extensions
+  - networking.k8s.io
+  resources:
+  - ingresses
+  verbs:
+  - get
+  - list
+  - watch
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: {{ include "kubernetes-pfsense-controller.fullname" . }}-{{ .Release.Namespace }}
+  labels:
+    {{- include "kubernetes-pfsense-controller.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ include "kubernetes-pfsense-controller.fullname" . }}-{{ .Release.Namespace }}
+subjects:
+- kind: ServiceAccount
+  name: {{ include "kubernetes-pfsense-controller.serviceAccountName" . }}
+  namespace: {{ .Release.Namespace }}
+{{- end }}

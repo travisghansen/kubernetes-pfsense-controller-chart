@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "kubernetes-pfsense-controller.fullname" . }}
+  labels:
+    {{- include "kubernetes-pfsense-controller.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "kubernetes-pfsense-controller.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "kubernetes-pfsense-controller.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "kubernetes-pfsense-controller.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: CONTROLLER_NAME
+              value: {{ include "kubernetes-pfsense-controller.fullname" . }}
+            - name: CONTROLLER_NAMESPACE
+              value: {{ .Release.Namespace }}
+            - name: PFSENSE_URL
+              value: {{ .Values.pfsense.url | quote }}
+              # allow self-signed certs
+            - name: PFSENSE_INSECURE
+              value: {{ .Values.pfsense.insecure | quote }}
+            - name: PFSENSE_USERNAME
+              value: {{ .Values.pfsense.username | quote }}
+            - name: PFSENSE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "kubernetes-pfsense-controller.fullname" . }}
+                  key: pfsense-password
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
